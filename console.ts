@@ -43,6 +43,7 @@ server.post("/", function (req, res) {
 
 /* -------------------------------- Start up -------------------------------- */
 
+
 // Listen
 server.listen(SERVER_PORT, () => {
     mainLogger.log(SERVER_MSG);
