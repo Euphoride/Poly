@@ -1,18 +1,7 @@
 "use strict";
 /* -------------------------------------------------------------------------- */
-/*                                PushToken.ts                                */
+/*                               CheckAccount.ts                              */
 /* -------------------------------------------------------------------------- */
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -50,47 +39,30 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Mongoose Import so we can work with schemas, models and searching
-var mongoose_1 = require("mongoose");
-// Uuid for random secure tokens
-var uuid_1 = require("uuid");
 /* ----------------------------- Mongoose Setup ----------------------------- */
-var AccessTokenSchema = new mongoose_1.Schema({
-    token: String,
-    browserID: String,
-    username: String
-});
-var AccessTokenModel = new mongoose_1.model("AccessToken", AccessTokenSchema, "AccessTokens");
-/* --------------------------- Making Token Setup --------------------------- */
-function MakeToken(browserID, username) {
+var Schemas_1 = require("../../Schemas/Schemas");
+/* ------------------------ Account Referencing Setup ----------------------- */
+// Here we're checking our account information using what information we grabbed
+// using CrossRef.ts
+function SearchAccount(username, password) {
     return __awaiter(this, void 0, void 0, function () {
-        var token, search, pEntry, newToken, newTokenDocument, newToken;
+        var search, accountInformation;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    token = uuid_1.v4();
                     search = {
-                        browserID: browserID,
-                        username: username
+                        username: username,
+                        password: password
                     };
-                    return [4 /*yield*/, AccessTokenModel.findOne(search)];
+                    return [4 /*yield*/, Schemas_1.Accounts.findOne(search)];
                 case 1:
-                    pEntry = _a.sent();
-                    if (!!pEntry) return [3 /*break*/, 3];
-                    newToken = __assign(__assign({}, search), { token: token });
-                    newTokenDocument = new AccessTokenModel(newToken);
-                    return [4 /*yield*/, newTokenDocument.save()];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/, token];
-                case 3:
-                    newToken = __assign(__assign({}, search), { token: token });
-                    return [4 /*yield*/, AccessTokenModel.findOneAndUpdate(search, newToken)];
-                case 4:
-                    _a.sent();
-                    return [2 /*return*/, token];
+                    accountInformation = _a.sent();
+                    if (!accountInformation) {
+                        return [2 /*return*/, true];
+                    }
+                    return [2 /*return*/, accountInformation];
             }
         });
     });
 }
-exports.default = MakeToken;
+exports.default = SearchAccount;

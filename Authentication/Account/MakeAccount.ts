@@ -2,19 +2,9 @@
 /*                               MakeAccount.ts                               */
 /* -------------------------------------------------------------------------- */
 
-// Mongoose Import so we can work with schemas, models and searching
-import mongoose, { Schema, model, Model } from "mongoose";
-
 /* ----------------------------- Mongoose Setup ----------------------------- */
 
-const AccountSchema = new Schema({
-    username : String,
-    password : String,
-    type     : String
-});
-
-
-const AccountModel = new (model as any)("Account", AccountSchema, "Accounts");
+import {Accounts as AccountModel} from "../../Schemas/Schemas";
 
 
 /* -------------------------- Account Making Setup -------------------------- */
@@ -24,7 +14,7 @@ const AccountModel = new (model as any)("Account", AccountSchema, "Accounts");
 
 let ALLOWED_TYPES : Array<string> = ["test"];
 
-async function MakeAccount(username : string, password: string, type : string) {
+export default async function MakeAccount(username : string, password: string, type : string) {
     // Check if the account exists already
 
     let search = {
@@ -41,6 +31,10 @@ async function MakeAccount(username : string, password: string, type : string) {
             return "Type not allowed";
         }
 
+        if (username == "") {
+            return "Username not allowed";
+        }
+
         let newAccount = {
             username: username,
             password: password,
@@ -50,10 +44,10 @@ async function MakeAccount(username : string, password: string, type : string) {
         let newAccountDocument = new AccountModel(newAccount);
 
         await newAccountDocument.save();
-        return;
+        return null;
     } else {
         // Account exists, so we need to return an error message
 
-        return "Account Exists"
+        return "Account Exists";
     }
 }

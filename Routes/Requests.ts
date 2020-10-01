@@ -38,7 +38,7 @@ interface iSearchQueryInformation {
 
 // Class definition
 
-export class Requests {
+export default class Requests {
   // Mongoose configuration props
   MongoosePath: string;
   MongooseConfig: iMongooseConfig;

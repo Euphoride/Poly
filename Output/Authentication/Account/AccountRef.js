@@ -39,15 +39,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Mongoose Import so we can work with schemas, models and searching
-var mongoose_1 = require("mongoose");
 /* ----------------------------- Mongoose Setup ----------------------------- */
-var AccountSchema = new mongoose_1.Schema({
-    username: String,
-    password: String,
-    type: String
-});
-var AccountModel = new mongoose_1.model("Account", AccountSchema, "Accounts");
+var Schemas_1 = require("../../Schemas/Schemas");
 /* ------------------------ Account Referencing Setup ----------------------- */
 // Here we're checking our account information using what information we grabbed
 // using CrossRef.ts
@@ -61,7 +54,7 @@ function AccountReference(informationPack) {
                     search = {
                         username: username
                     };
-                    return [4 /*yield*/, AccountModel.findOne(search)];
+                    return [4 /*yield*/, Schemas_1.Accounts.findOne(search)];
                 case 1:
                     accountInformation = _a.sent();
                     return [2 /*return*/, accountInformation];

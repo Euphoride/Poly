@@ -1,7 +1,6 @@
 /* -------------------------------------------------------------------------- */
-/*                                AccountRef.ts                               */
+/*                               CheckAccount.ts                              */
 /* -------------------------------------------------------------------------- */
-
 
 /* ----------------------------- Mongoose Setup ----------------------------- */
 
@@ -13,14 +12,18 @@ import {Accounts as AccountModel} from "../../Schemas/Schemas";
 // Here we're checking our account information using what information we grabbed
 // using CrossRef.ts
 
-export default async function AccountReference(informationPack : any) {
-    let username : string = informationPack.username;
+export default async function SearchAccount(username: string, password: string) {
 
     let search = {
-        username: username
+        username: username,
+        password: password
     }
 
     let accountInformation = await AccountModel.findOne(search);
+
+    if (!accountInformation) {
+        return true;
+    }
 
     return accountInformation;
 }

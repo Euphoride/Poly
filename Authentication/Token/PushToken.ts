@@ -6,7 +6,7 @@
 import mongoose, { Schema, model, Model } from "mongoose";
 
 // Uuid for random secure tokens
-import uuid from "uuid";
+import {v4 as uuidv4} from "uuid";
 
 /* ----------------------------- Mongoose Setup ----------------------------- */
 
@@ -21,9 +21,10 @@ const AccessTokenModel = new (model as any)("AccessToken", AccessTokenSchema, "A
 
 /* --------------------------- Making Token Setup --------------------------- */
 
-async function MakeToken(browserID : String, username : String) {
+export default async function MakeToken(browserID : String, username : String) {
+    
     // Generate this round's token
-    let token : string = uuid.v4();
+    let token : string = uuidv4();
 
     // Check if this username-browserID combo has an entry
 

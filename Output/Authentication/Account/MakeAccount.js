@@ -39,15 +39,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Mongoose Import so we can work with schemas, models and searching
-var mongoose_1 = require("mongoose");
 /* ----------------------------- Mongoose Setup ----------------------------- */
-var AccountSchema = new mongoose_1.Schema({
-    username: String,
-    password: String,
-    type: String
-});
-var AccountModel = new mongoose_1.model("Account", AccountSchema, "Accounts");
+var Schemas_1 = require("../../Schemas/Schemas");
 /* -------------------------- Account Making Setup -------------------------- */
 // Here we're making accounts using a given set of username, password and type
 // there are also restrictions on allowed types
@@ -61,7 +54,7 @@ function MakeAccount(username, password, type) {
                     search = {
                         username: username
                     };
-                    return [4 /*yield*/, AccountModel.findOne(search)];
+                    return [4 /*yield*/, Schemas_1.Accounts.findOne(search)];
                 case 1:
                     foundAccount = _a.sent();
                     if (!!foundAccount) return [3 /*break*/, 3];
@@ -70,16 +63,19 @@ function MakeAccount(username, password, type) {
                     if (!ALLOWED_TYPES.includes(type)) {
                         return [2 /*return*/, "Type not allowed"];
                     }
+                    if (username == "") {
+                        return [2 /*return*/, "Username not allowed"];
+                    }
                     newAccount = {
                         username: username,
                         password: password,
                         type: type
                     };
-                    newAccountDocument = new AccountModel(newAccount);
+                    newAccountDocument = new Schemas_1.Accounts(newAccount);
                     return [4 /*yield*/, newAccountDocument.save()];
                 case 2:
                     _a.sent();
-                    return [2 /*return*/];
+                    return [2 /*return*/, null];
                 case 3: 
                 // Account exists, so we need to return an error message
                 return [2 /*return*/, "Account Exists"];
@@ -87,3 +83,4 @@ function MakeAccount(username, password, type) {
         });
     });
 }
+exports.default = MakeAccount;
