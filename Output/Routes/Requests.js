@@ -77,6 +77,7 @@ var Requests = /** @class */ (function () {
                 _a = query.split(" "), queryTrack = _a[0], collectionName = _a[1];
                 if (!this.Collections.hasOwnProperty(collectionName)) {
                     console.log("[Query]: Collection wasn't found");
+                    console.log("[Query]: " + collectionName);
                     return [2 /*return*/, false];
                 }
                 trackFunction = this.Tracks[queryTrack];

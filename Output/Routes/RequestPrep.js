@@ -48,10 +48,12 @@ var CrossRef_1 = __importDefault(require("../Authentication/Token/CrossRef"));
 var Unpack_1 = __importDefault(require("../Authentication/Border/Unpack"));
 // Uses: Subject, Method
 var dualMethods = ["Modify"];
-function prepRequest(informationPack, reqObj) {
-    var Query = informationPack.Subject + " " + informationPack.Method;
+var sDefinedMethods = ["Delete"];
+function prepRequest(informationPack, reqObj, quiet) {
+    if (quiet === void 0) { quiet = false; }
+    var Query = informationPack.Method + " " + informationPack.Subject;
     var AccessObj = new Access_1.default();
-    AccessObj.load("../Authentication/Access Control/Table.json");
+    AccessObj.load("./Authentication/Access Control/Table.json");
     var requestMethod = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var pack, tokenPack, accountInformation, QueryFeed, selfAlterPermitted, globalAlterPermitted, response, response;
@@ -66,8 +68,8 @@ function prepRequest(informationPack, reqObj) {
                     case 2:
                         accountInformation = _a.sent();
                         QueryFeed = req.body.bundle;
-                        selfAlterPermitted = AccessObj.checkPermission(accountInformation.type, informationPack.path, "self");
-                        globalAlterPermitted = AccessObj.checkPermission(accountInformation.type, informationPack.path, "global");
+                        selfAlterPermitted = AccessObj.checkPermission(accountInformation.type, informationPack.route, "self");
+                        globalAlterPermitted = AccessObj.checkPermission(accountInformation.type, informationPack.route, "global");
                         if (!globalAlterPermitted) return [3 /*break*/, 4];
                         return [4 /*yield*/, reqObj.Query(Query, QueryFeed)];
                     case 3:
@@ -92,14 +94,19 @@ function prepRequest(informationPack, reqObj) {
                             return [2 /*return*/];
                         }
                         if (dualMethods.includes(informationPack.Method)) {
-                            QueryFeed = [{ username: accountInformation }, QueryFeed];
+                            QueryFeed = [{ username: accountInformation.username }, QueryFeed];
+                        }
+                        else if (sDefinedMethods.includes(informationPack.Method)) {
+                            QueryFeed = { username: accountInformation.username };
                         }
                         return [4 /*yield*/, reqObj.Query(Query, QueryFeed)];
                     case 5:
                         response = _a.sent();
-                        res.json({
-                            message: response
-                        });
+                        if (!quiet) {
+                            res.json({
+                                message: true
+                            });
+                        }
                         return [3 /*break*/, 7];
                     case 6:
                         res.json({

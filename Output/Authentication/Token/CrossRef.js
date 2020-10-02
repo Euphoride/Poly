@@ -39,19 +39,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Mongoose Import so we can work with schemas, models and searching
-var mongoose_1 = require("mongoose");
 /* ----------------------------- Mongoose Setup ----------------------------- */
-var AccessTokenSchema = new mongoose_1.Schema({
-    token: String,
-    browserID: String,
-    username: String
-});
-var AccessTokenModel = new mongoose_1.model("AccessToken", AccessTokenSchema, "AccessTokens");
+var Schemas_1 = require("../../Schemas/Schemas");
 /* ------------------------- Cross Refenencing Setup ------------------------ */
 var DEBUG = true;
 var TOKEN_REF = {
-    "Access Token": AccessTokenModel
+    "Access Token": Schemas_1.Tokens
 };
 var CR_INFO = ["browserID", "username"];
 function CrossReference(tokenPack) {

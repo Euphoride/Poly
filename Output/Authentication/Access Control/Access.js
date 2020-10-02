@@ -31,7 +31,11 @@ var Access = /** @class */ (function () {
         if (permissions != undefined) {
             pIncludes = permissions.includes(action);
         }
-        return pIncludes || this.checkPermission("*", requestRoute, action);
+        var wIncludes = false;
+        if (this.readPermissions("*", requestRoute) != undefined) {
+            wIncludes = this.checkPermission("*", requestRoute, action);
+        }
+        return pIncludes || wIncludes;
     };
     Access.prototype.addAction = function (accountType, requestRoute, action) {
         if (this.loadedAccessTable[requestRoute][accountType] == undefined) {

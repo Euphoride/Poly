@@ -42,7 +42,13 @@ export default class Access {
             pIncludes = permissions.includes(action)
         }
 
-        return pIncludes || this.checkPermission("*", requestRoute, action);
+        let wIncludes = false;
+        
+        if (this.readPermissions("*", requestRoute) != undefined) {
+            wIncludes = this.checkPermission("*", requestRoute, action)
+        }
+
+        return pIncludes || wIncludes;
     }
 
     addAction(accountType: string, requestRoute: string, action: string) {

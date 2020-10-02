@@ -12,7 +12,7 @@ import {Accounts as AccountModel} from "../../Schemas/Schemas";
 // Here we're making accounts using a given set of username, password and type
 // there are also restrictions on allowed types
 
-let ALLOWED_TYPES : Array<string> = ["test"];
+let ALLOWED_TYPES : Array<string> = ["test", "Staff", "Patient", "Admin"];
 
 export default async function MakeAccount(username : string, password: string, type : string) {
     // Check if the account exists already

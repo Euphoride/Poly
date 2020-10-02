@@ -89,6 +89,7 @@ export default class Requests {
 
     if (!this.Collections.hasOwnProperty(collectionName)) {
       console.log("[Query]: Collection wasn't found");
+      console.log("[Query]: " + collectionName);
       return false;
     }
 
@@ -147,6 +148,7 @@ export default class Requests {
 
   async Delete(collection: Mongoose.Model<any>, queryInformation: iQueryInformation): Promise<any> {
     console.log("[Delete]: Entered [Delete]. Deleting item... Note: Using findOneAndDelete");
+
 
     let item = await collection.findOneAndDelete(queryInformation);
 

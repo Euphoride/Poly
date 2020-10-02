@@ -45,10 +45,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /* --------------------------------- Imports -------------------------------- */
 var express_1 = __importDefault(require("express"));
 var Logger_1 = __importDefault(require("./Logging/Logger"));
+var informationExtractor_1 = __importDefault(require("./Routes/informationExtractor"));
+var RequestPrep_1 = __importDefault(require("./Routes/RequestPrep"));
 var Requests_1 = __importDefault(require("./Routes/Requests"));
 var MakeAccount_1 = __importDefault(require("./Authentication/Account/MakeAccount"));
 var CheckAccount_1 = __importDefault(require("./Authentication/Account/CheckAccount"));
 var PushToken_1 = __importDefault(require("./Authentication/Token/PushToken"));
+var Unpack_1 = __importDefault(require("./Authentication/Border/Unpack"));
+var CrossRef_1 = __importDefault(require("./Authentication/Token/CrossRef"));
+var AccountRef_1 = __importDefault(require("./Authentication/Account/AccountRef"));
+var Access_1 = __importDefault(require("./Authentication/Access Control/Access"));
+var Schemas_1 = require("./Schemas/Schemas");
 /* --------------------------------- Set up --------------------------------- */
 // Start Logging Instance
 var mainLogger = new Logger_1.default("Main");
@@ -66,10 +73,75 @@ server.post("/", function (req, res) {
     res.json(req.body);
     res.end();
 });
+/* --------------------------- Access Definitions --------------------------- */
+var AccessObject = new Access_1.default();
+AccessObject.load("./Authentication/Access Control/Table.json");
+// Account stuff
+AccessObject.addRequestRoute("/Account/Delete");
+AccessObject.addAction("test", "/Account/Delete", "global");
+// Staff Profiles
+AccessObject.addRequestRoute("/StaffProfile/Make");
+AccessObject.addAction("Staff", "/StaffProfile/Make", "self");
+AccessObject.addAction("Admin", "/StaffProfile/Make", "global");
+AccessObject.addRequestRoute("/StaffProfile/Find");
+AccessObject.addAction("Admin", "/StaffProfile/Find", "global");
+AccessObject.addRequestRoute("/StaffProfile/Modify");
+AccessObject.addAction("Staff", "/StaffProfile/Modify", "self");
+AccessObject.addAction("Admin", "/StaffProfile/Modify", "global");
+AccessObject.addRequestRoute("/StaffProfile/Delete");
+AccessObject.addAction("Staff", "/StaffProfile/Delete", "self");
+AccessObject.addAction("Admin", "/StaffProfile/Delete", "global");
+// Patient Profiles
+AccessObject.addRequestRoute("/PatientProfile/Make");
+AccessObject.addAction("Patient", "/PatientProfile/Make", "self");
+AccessObject.addAction("Admin", "/PatientProfile/Make", "global");
+AccessObject.addRequestRoute("/PatientProfile/Find");
+AccessObject.addAction("Staff", "/PatientProfile/Find", "global");
+AccessObject.addAction("Admin", "/PatientProfile/Find", "global");
+AccessObject.addRequestRoute("/PatientProfile/Modify");
+AccessObject.addAction("Patient", "/PatientProfile/Modify", "self");
+AccessObject.addAction("Admin", "/PatientProfile/Modify", "global");
+AccessObject.addRequestRoute("/PatientProfile/Delete");
+AccessObject.addAction("Patient", "/PatientProfile/Delete", "self");
+AccessObject.addAction("Admin", "/PatientProfile/Delete", "global");
+// Patient Test Records (NHSNumber / Test)
+AccessObject.addRequestRoute("/PatientTestRecord/Make");
+AccessObject.addAction("Staff", "/PatientTestRecord/Make", "global");
+AccessObject.addAction("Admin", "/PatientTestRecord/Make", "global");
+AccessObject.addRequestRoute("/PatientTestRecord/Find");
+AccessObject.addAction("Patient", "/PatientTestRecord/Find", "self");
+AccessObject.addAction("Staff", "/PatientTestRecord/Find", "global");
+AccessObject.addAction("Admin", "/PatientTestRecord/Find", "global");
+AccessObject.addRequestRoute("/PatientTestRecord/Modify");
+AccessObject.addAction("Staff", "/PatientTestRecord/Modify", "global");
+AccessObject.addAction("Admin", "/PatientTestRecord/Modify", "global");
+AccessObject.addRequestRoute("/PatientTestRecord/Delete");
+AccessObject.addAction("Staff", "/PatientTestRecord/Delete", "global");
+AccessObject.addAction("Admin", "/PatientTestRecord/Delete", "global");
+// Patient Test Information
+AccessObject.addRequestRoute("/PatientTestInformation/Make");
+AccessObject.addAction("Staff", "/PatientTestInformation/Make", "global");
+AccessObject.addAction("Admin", "/PatientTestInformation/Make", "global");
+AccessObject.addRequestRoute("/PatientTestInformation/Find");
+AccessObject.addAction("Patient", "/PatientTestInformation/Find", "self");
+AccessObject.addAction("Staff", "/PatientTestInformation/Find", "global");
+AccessObject.addAction("Admin", "/PatientTestInformation/Find", "global");
+AccessObject.addRequestRoute("/PatientTestInformation/Modify");
+AccessObject.addAction("Staff", "/PatientTestInformation/Modify", "global");
+AccessObject.addAction("Admin", "/PatientTestInformation/Modify", "global");
+AccessObject.addRequestRoute("/PatientTestInformation/Delete");
+AccessObject.addAction("Staff", "/PatientTestInformation/Delete", "global");
+AccessObject.addAction("Admin", "/PatientTestInformation/Delete", "global");
 /* -------------------------------- Start up -------------------------------- */
 var dbInterface = new Requests_1.default({
     MongoosePath: "NHS"
 });
+dbInterface.configure("Account", Schemas_1.Accounts);
+dbInterface.configure("Token", Schemas_1.Tokens);
+dbInterface.configure("StaffProfile", Schemas_1.StaffProfiles);
+dbInterface.configure("PatientProfile", Schemas_1.PatientProfiles);
+dbInterface.configure("PatientTestRecord", Schemas_1.patientTests);
+dbInterface.configure("PatientTestInformation", Schemas_1.testInformation);
 server.route("/Account/Make").post(function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var username, password, type, response;
@@ -119,6 +191,62 @@ server.route("/Token/Push").post(function (req, res) {
                 case 4: return [2 /*return*/];
             }
         });
+    });
+});
+server.route("/Account/Delete").post(function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var accountType, accountInformation, tokenPack, tokenInformation, isSelf, isGlobal;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    accountType = "public";
+                    accountInformation = {};
+                    tokenPack = Unpack_1.default(req);
+                    if (!tokenPack.hasOwnProperty("Access Token")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, CrossRef_1.default(tokenPack)];
+                case 1:
+                    tokenInformation = _a.sent();
+                    return [4 /*yield*/, AccountRef_1.default(tokenInformation)];
+                case 2:
+                    accountInformation = _a.sent();
+                    accountType = accountInformation.type;
+                    _a.label = 3;
+                case 3:
+                    isSelf = AccessObject.checkPermission(accountType, req.path, "self");
+                    isGlobal = AccessObject.checkPermission(accountType, req.path, "global");
+                    if (isGlobal) {
+                        dbInterface.Query("Delete Account", { username: req.body.bundle.username });
+                        dbInterface.Query("Delete Token", { username: req.body.bundle.username });
+                        res.json({
+                            message: "Success"
+                        });
+                    }
+                    else if (isSelf) {
+                        dbInterface.Query("Delete Account", { username: accountInformation.username });
+                        dbInterface.Query("Delete Token", { username: accountInformation.username });
+                        res.json({
+                            message: "Success"
+                        });
+                    }
+                    else {
+                        res.json({
+                            message: "Path not allowed"
+                        });
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+});
+/* ---------------------------- Route Definitions --------------------------- */
+var verbs = ["Make", "Find", "Modify", "Delete"];
+var paths = ["StaffProfile", "PatientProfile", "PatientTestRecord", "PatientTestInformation"];
+paths.forEach(function (path) {
+    verbs.forEach(function (verb) {
+        var route = server.route("/" + path + "/" + verb);
+        var info = informationExtractor_1.default(route);
+        var method = RequestPrep_1.default(info, dbInterface);
+        route.post(method);
     });
 });
 // Listen

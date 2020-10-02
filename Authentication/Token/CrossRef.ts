@@ -3,18 +3,11 @@
 /* -------------------------------------------------------------------------- */
 
 // Mongoose Import so we can work with schemas, models and searching
-import mongoose, { Schema, model, Model } from "mongoose";
+import { Model } from "mongoose";
 
 /* ----------------------------- Mongoose Setup ----------------------------- */
+import {Tokens as AccessTokenModel} from "../../Schemas/Schemas";
 
-const AccessTokenSchema = new Schema({
-    token     : String,
-    browserID : String,
-    username  : String
-});
-
-
-const AccessTokenModel = new (model as any)("AccessToken", AccessTokenSchema, "AccessTokens");
 
 
 /* ------------------------- Cross Refenencing Setup ------------------------ */
@@ -49,6 +42,7 @@ export default async function CrossReference(tokenPack : any) {
             }
 
             let tokenInformation = await collection.findOne(search);
+
 
             // loop over the search to see if it's part of the cross reference information
             // and if so, add it to the return pack

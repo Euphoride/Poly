@@ -44,7 +44,7 @@ var Schemas_1 = require("../../Schemas/Schemas");
 /* -------------------------- Account Making Setup -------------------------- */
 // Here we're making accounts using a given set of username, password and type
 // there are also restrictions on allowed types
-var ALLOWED_TYPES = ["test"];
+var ALLOWED_TYPES = ["test", "Staff", "Patient", "Admin"];
 function MakeAccount(username, password, type) {
     return __awaiter(this, void 0, void 0, function () {
         var search, foundAccount, newAccount, newAccountDocument;

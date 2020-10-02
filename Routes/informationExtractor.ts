@@ -23,6 +23,7 @@ export default function extract(routeObject: IRoute) {
         rObject[format[iterator - 1]] = pathComponents[iterator];
     }
 
+
     rObject["routeObject"] = routeObject;
     rObject["route"] = path;
 

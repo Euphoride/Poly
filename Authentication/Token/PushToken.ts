@@ -2,22 +2,13 @@
 /*                                PushToken.ts                                */
 /* -------------------------------------------------------------------------- */
 
-// Mongoose Import so we can work with schemas, models and searching
-import mongoose, { Schema, model, Model } from "mongoose";
-
 // Uuid for random secure tokens
 import {v4 as uuidv4} from "uuid";
 
 /* ----------------------------- Mongoose Setup ----------------------------- */
 
-const AccessTokenSchema = new Schema({
-    token     : String,
-    browserID : String,
-    username  : String
-});
+import {Tokens as AccessTokenModel} from "../../Schemas/Schemas";
 
-
-const AccessTokenModel = new (model as any)("AccessToken", AccessTokenSchema, "AccessTokens");
 
 /* --------------------------- Making Token Setup --------------------------- */
 
@@ -42,6 +33,8 @@ export default async function MakeToken(browserID : String, username : String) {
             ...search,
             token: token
         }
+
+        console.log(newToken);
 
         let newTokenDocument = new AccessTokenModel(newToken);
 

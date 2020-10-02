@@ -50,17 +50,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Mongoose Import so we can work with schemas, models and searching
-var mongoose_1 = require("mongoose");
 // Uuid for random secure tokens
 var uuid_1 = require("uuid");
 /* ----------------------------- Mongoose Setup ----------------------------- */
-var AccessTokenSchema = new mongoose_1.Schema({
-    token: String,
-    browserID: String,
-    username: String
-});
-var AccessTokenModel = new mongoose_1.model("AccessToken", AccessTokenSchema, "AccessTokens");
+var Schemas_1 = require("../../Schemas/Schemas");
 /* --------------------------- Making Token Setup --------------------------- */
 function MakeToken(browserID, username) {
     return __awaiter(this, void 0, void 0, function () {
@@ -73,19 +66,20 @@ function MakeToken(browserID, username) {
                         browserID: browserID,
                         username: username
                     };
-                    return [4 /*yield*/, AccessTokenModel.findOne(search)];
+                    return [4 /*yield*/, Schemas_1.Tokens.findOne(search)];
                 case 1:
                     pEntry = _a.sent();
                     if (!!pEntry) return [3 /*break*/, 3];
                     newToken = __assign(__assign({}, search), { token: token });
-                    newTokenDocument = new AccessTokenModel(newToken);
+                    console.log(newToken);
+                    newTokenDocument = new Schemas_1.Tokens(newToken);
                     return [4 /*yield*/, newTokenDocument.save()];
                 case 2:
                     _a.sent();
                     return [2 /*return*/, token];
                 case 3:
                     newToken = __assign(__assign({}, search), { token: token });
-                    return [4 /*yield*/, AccessTokenModel.findOneAndUpdate(search, newToken)];
+                    return [4 /*yield*/, Schemas_1.Tokens.findOneAndUpdate(search, newToken)];
                 case 4:
                     _a.sent();
                     return [2 /*return*/, token];
